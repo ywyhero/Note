@@ -5,33 +5,38 @@
       <div class="btn-group btn-group-justified" role="group">
         <!-- All Notes button -->
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" @click="show = 'all'" :class="{active: this.show === 'all'}">All Notes</button>
+          <button type="button" @click="allClick" :class="{active: show === 'all'}" class="btn btn-default">All Notes</button>
         </div>
         <!-- Favorites Button -->
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-default" @click="show = 'favorite'" :class="{active: this.show === 'favorite'}">Favorites</button>
+          <button type="button" @click="favoriteClick" :class="{active: show === 'favorite'}" class="btn btn-default">Favorites</button>
         </div>
       </div>
     </div>
     <!-- render notes in a list -->
     <div class="container">
       <div class="list-group">
-        <a class="list-group-item" :class="{active: $store.state.activeNote === note}" href="#" v-for="(note, index) in notes" @click="setActiveNote(note, index)">
-          <h4 class="list-group-item-heading">{{note.text.trim().substr(0, 10)}}</h4>
+        <a class="list-group-item" href="#" :class="{active: activeNote == note}" @click="activeNoteClick($event, note)" :data-index="index" v-for="(note, index) in notes" :key="index">
+          <h4 class="list-group-item-heading" :data-index="index">{{note.text.trim().substr(0, 10)}}</h4>
         </a>
       </div>
     </div>
   </div>
 </template>
 <script>
+  import {mapGetters, mapActions} from 'vuex'
   export default {
     data () {
       return {
-        show: 'all'
+        show: 'all',
       }
     },
-    computed: {
-      notes () {
+    computed:{
+      ...mapGetters({
+        activeNote: 'getActiveNote',
+        dIndex: 'getIndex'
+      }),
+      notes(){
         if (this.show === 'all') {
           return this.$store.state.notes
         } else if (this.show === 'favorite') {
@@ -40,9 +45,20 @@
       }
     },
     methods: {
-      setActiveNote (note, $index) {
-        this.$store.dispatch('setActiveNote', note)
-        this.$store.state.index = $index
+      ...mapActions({
+        getActiveNote: 'activeNote',
+        changeIndex: 'changeIndex'
+      }),
+      activeNoteClick(e, note){
+        let index = e.currentTarget.dataset.index;
+        this.changeIndex(index)
+        this.getActiveNote(note) 
+      },
+      allClick(){
+        this.show = 'all'
+      },
+      favoriteClick(){
+        this.show = 'favorite'
       }
     }
   }

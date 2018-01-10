@@ -1,18 +1,24 @@
 <template>
   <div id="note-editor">
-    <textarea :value="noteText" @input="editorNote" class="form-control"></textarea>
+    <textarea class="form-control" v-model="activeNote.text" @change="handleChange"></textarea>
   </div>
 </template>
 <script>
+  import {mapGetters, mapActions} from 'vuex'
   export default {
     computed: {
-      noteText () {
-        return this.$store.state.activeNote.text
-      }
+      ...mapGetters({
+        activeNote: 'getActiveNote'
+      }),
+    
     },
-    methods: {
-      editorNote (e) {
-        this.$store.dispatch('editorNote', e)
+    methods:{
+      ...mapActions({
+        editeNote: 'editeNote'
+      }),
+      handleChange(){
+        let text = this.activeNote.text
+        this.editeNote(text)
       }
     }
   }

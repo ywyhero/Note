@@ -1,31 +1,33 @@
 <template>
   <div id="toolbar">
-    <i @click="addNote" class="glyphicon glyphicon-plus"></i>
-    <i @click="toggleFavorite" :class="{'starred': $store.state.activeNote.favorite}" class="glyphicon glyphicon-star"></i>
-    <i @click="deleteNote" class="glyphicon glyphicon-remove"></i>
+    <i @click="addClick" class="glyphicon glyphicon-plus"></i>
+    <i @click="favoriteNote" :class="{starred: activeNote.favorite}" class="glyphicon glyphicon-star"></i>
+    <i @click="removeClick" class="glyphicon glyphicon-remove"></i>
   </div>
 </template>
 <script>
+  import{ mapGetters, mapActions } from 'vuex'
   export default {
-    methods: {
-      addNote () {
-        this.$store.dispatch('addNote')
-        this.$store.state.index = this.$store.state.notes.length - 1
+    computed:{
+      ...mapGetters({
+        notes: 'getNotes',
+        dIndex: 'getIndex',
+        activeNote: 'getActiveNote'
+      })
+    },
+    methods:{
+      ...mapActions({
+        addNote: 'addNote',
+        changeIndex: 'changeIndex',
+        removeNote: 'removeNote',
+        favoriteNote: 'favoriteNote'
+      }),
+      addClick(){
+         this.addNote(this.notes.length)
       },
-      toggleFavorite () {
-        if (this.$store.state.notes.length === 0) {
-          return
-        } else {
-          this.$store.dispatch('toggleFavorite')
-        }
-      },
-      deleteNote () {
-        if (this.$store.state.notes.length === 1) {
-          return
-        } else {
-          this.$store.state.index = this.$store.state.notes.length - 1
-          this.$store.dispatch('deleteNote')
-        }
+      removeClick(){
+        this.removeNote();
+
       }
     }
   }
